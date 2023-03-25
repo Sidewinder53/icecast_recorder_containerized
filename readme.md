@@ -1,25 +1,16 @@
-# Icecast recorder
-Script for downloading a stream from IceCast-compatible servers. Uses information from icy protocol to split stream into separate tracks
+# Containerized Icecast recorder
+This is a slightly adapted version of the excellent [icecast_recorder by Jipok](https://github.com/Jipok/icecast_recorder).
 
-![screenshot](screenshot.png)
+This container records a stream from IceCast-compatible servers for n amount of minutes and splits it into separate tracks with the specified file extension.
 
 # Usage
-As in the screenshot.
+Run the container:
+`docker run ghcr.io/Sidewinder53/icecast_recorder_containerized:latest <icecast stream url> <number of minutes to record> <file extension>`
 
-Python3 is required. No additional dependencies.
-```
-wget https://raw.githubusercontent.com/Jipok/icecast_recorder/master/icecast_recorder.py
-chmod +x icecast_recorder.py
-
-./icecast_recorder.py STREAM_URL
-```
+Example:
+`docker run ghcr.io/Sidewinder53/icecast_recorder_containerized:latest https://st03.sslstream.dlf.de/dlf/03/high/aac/stream.aac?aggregator=web 60 aac`
 
 ## Tips
 * You can find links to streams inside pls/m3u playlists intended for media players
-* Although the script saves files with the mp3 extension, it doesn't really know anything about the content
-* * It can be any format, just change ".mp3" on line 78
 * Track boundaries are not very accurate. You can hear a couple of seconds from another track at the beginning or end of the current
 * If you are interested in the description of the protocol, then see [cast.readme.io/docs/icy](https://cast.readme.io/docs/icy)
-* * This screenshot may also help you:
-
-![shoutcast-metadata](shoutcast-metadata.jpg)
