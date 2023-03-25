@@ -3,17 +3,24 @@ import os
 import sys
 import traceback
 from urllib.request import Request, urlopen
-from time import time
+from time import time, monotonic, strftime
 from datetime import timedelta
 
-if len(sys.argv) != 2:
-    print("Usage: icecast_recorder.py <url>")
+if len(sys.argv) != 4:
+    print("Usage: icecast_recorder.py <url> <number of minutes to record> <output file extension>")
     sys.exit(1)
 
 
 # FROM: https://cast.readme.io/docs/icy
 # If client sends Icy-MetaData:1 header this means client supports ICY-metadata
 stream = urlopen(Request(sys.argv[1], headers={"Icy-MetaData": "1"}), timeout=8)
+timeout = int(sys.argv[2])
+extension = sys.argv[3]
+
+if not isinstance(timeout, int):
+    print("Usage: icecast_recorder.py <url> <number of minutes to record> <output file extension>")
+    sys.exit(1)
+
 headers = dict((k.lower(), v) for k, v in stream.getheaders())
 
 # FROM: https://cast.readme.io/docs/icy
@@ -42,12 +49,14 @@ if "icy-br" in headers:
 print("--------------------------------------------")
 
 file = open("/dev/null", "wb")
-start_time = time()
+start_time = monotonic()
+end_time = monotonic() + timeout * 60
+basepath = strftime("%Y%m%d")
 counter = 0
 
 try:
     # Music download loop
-    while True:
+    while monotonic() < end_time:
         metadata = None
         # See shoutcast-metadata.jpg for stream struct
         # Save music chunk
@@ -75,7 +84,7 @@ try:
                 file.close()
                 #os.system("mp3check --add-tag --cut-junk-start --cut-junk-end '"+file.name+"' > /dev/null")
                 print(str(time_offset) + "   " + stream_title)
-                file = open(str(counter) + ". " + stream_title + ".mp3", "wb")
+                file = open(str(counter) + ". " + stream_title + "." + extension, "wb")
                 counter += 1
             else:
                 raise Exception("No StreamTitle in meta:", meta_data)
