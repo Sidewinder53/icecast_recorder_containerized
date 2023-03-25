@@ -5,10 +5,16 @@ This container records a stream from IceCast-compatible servers for n amount of 
 
 # Usage
 Run the container:
-`docker run ghcr.io/Sidewinder53/icecast_recorder_containerized:latest <icecast stream url> <number of minutes to record> <file extension>`
+```bash
+docker run ghcr.io/sidewinder53/icecast_recorder_containerized:master <url> <number of minutes to record> <output file extension>
+```
 
-Example:
-`docker run ghcr.io/Sidewinder53/icecast_recorder_containerized:latest https://st03.sslstream.dlf.de/dlf/03/high/aac/stream.aac?aggregator=web 60 aac`
+Example to record Deutschlandfunk Novas AAC stream for 60 minutes and store the result in `<working dir>/recordings`:
+```bash
+docker run -v $PWD/recordings:/var/recordings ghcr.io/sidewinder53/icecast_recorder_containerized:master https://st03.sslstream.dlf.de/dlf/03/high/aac/stream.aac?aggregator=web 60 aac
+```
+
+The output is stored inside the container in `/var/recordings/<date of recording>/<time of recording> - <Program>, <Host>.<output file extension>`.
 
 ## Tips
 * You can find links to streams inside pls/m3u playlists intended for media players
