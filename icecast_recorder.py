@@ -51,7 +51,10 @@ print("--------------------------------------------")
 file = open("/dev/null", "wb")
 start_time = monotonic()
 end_time = monotonic() + timeout * 60
-basepath = strftime("%Y%m%d")
+basepath = '/var/recordings/' + strftime("%Y%m%d") + '/'
+
+if not os.path.exists(basepath):
+   os.makedirs(basepath)
 counter = 0
 
 try:
@@ -78,13 +81,13 @@ try:
 
         # Processing track change
         if metadata is not None:
-            time_offset = timedelta(seconds = round(time() - start_time))
+            time_offset = timedelta(seconds = round(monotonic() - start_time))
             if "StreamTitle" in metadata:
                 stream_title = metadata["StreamTitle"].replace('/', '\\')
                 file.close()
                 #os.system("mp3check --add-tag --cut-junk-start --cut-junk-end '"+file.name+"' > /dev/null")
                 print(str(time_offset) + "   " + stream_title)
-                file = open(str(counter) + ". " + stream_title + "." + extension, "wb")
+                file = open(basepath + strftime("%H_%M") + " - " + stream_title + "." + extension, "wb")
                 counter += 1
             else:
                 raise Exception("No StreamTitle in meta:", meta_data)
